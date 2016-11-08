@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"encoding/json"
 	"io/ioutil"
-	"github.com/0xAX/notificator"
+	//"github.com/0xAX/notificator"
 	"time"
 )
 
@@ -16,47 +16,68 @@ type User struct {
 
 type Users []User
 
-func (users Users) contains(searchTerm string) (bool)  {
+func (users Users) contains(searchItem User) (bool)  {
 	for _, user := range users {
-		if user.Id == searchTerm {
+		if user.Id == searchItem.Id {
 			return true
 		}
 	}
 	return false
 }
 
-func main() {
-
-
-	var notify = notificator.New(notificator.Options{
-		DefaultIcon: "icon/default.png",
-		AppName:     "StalkIT",
-	})
-
-	users := getSmurfs("https://hubbit.chalmers.it/sessions.json")
-	for {
-		time.Sleep(100000)
-		oldUsers := users
-		users = getSmurfs("https://hubbit.chalmers.it/sessions.json")
-
-
-		for _, user := range users {
-			if !oldUsers.contains(user.Id) {
-				// user arrived
-				notify.Push("StalkIT", user.Nick + " has arrived at the Hubb", "/home/user/icon.png", notificator.UR_NORMAL)
-			}
-		}
-
-		for _, user := range oldUsers {
-			if !users.contains(user.Id) {
-				// user left
-				notify.Push("StalkIT", user.Nick + " has left the Hubb", "/home/user/icon.png", notificator.UR_NORMAL)
-			}
+func (users Users) usersMissingFrom(otherUsers Users, output chan User)  {
+	for _, user := range otherUsers  {
+		if !users.contains(user) {
+			output <- user
 		}
 	}
 }
 
-func getSmurfs(url string) (users Users) {
+func notifier(input chan User, append string)  {
+	for {
+		user := <-input
+		// user arrived
+		fmt.Println(user.Nick + append)
+		//notify.Push("StalkIT", user.Nick + " has arrived at the Hubb", "/home/user/icon.png", notificator.UR_NORMAL)
+	}
+}
+
+func main() {
+
+
+	/*var notify = notificator.New(notificator.Options{
+		DefaultIcon: "icon/default.png",
+		AppName:     "StalkIT",
+	})*/
+
+
+	input := make(chan Users)
+	outputArrivals := make(chan User)
+	outputDepartures := make(chan User)
+
+	var users Users
+	var oldUsers Users
+
+	go getSmurfs("https://hubbit.chalmers.it/sessions.json", input)
+	users = <-input
+
+	go notifier(outputArrivals, " has arrived at the Hubb")
+	go notifier(outputDepartures, " has left the Hubb")
+
+	for {
+		go getSmurfs("https://hubbit.chalmers.it/sessions.json", input)
+
+		time.Sleep(time.Second * 10)
+
+		oldUsers = users
+		users = <-input
+
+		go oldUsers.usersMissingFrom(users, outputArrivals) // arriving smurfs
+		go users.usersMissingFrom(oldUsers, outputDepartures) // leaving smurfs
+	}
+}
+
+func getSmurfs(url string, smurfRoad chan Users) {
 	r, e := http.Get(url)
 	if e != nil{
 		fmt.Printf(e.Error())
@@ -64,7 +85,8 @@ func getSmurfs(url string) (users Users) {
 	defer r.Body.Close()
 
 	body, _ := ioutil.ReadAll(r.Body)
+	var users Users
 	json.Unmarshal(body, &users)
 
-	return users
+	smurfRoad <- users
 }
