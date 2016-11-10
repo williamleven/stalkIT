@@ -3,15 +3,16 @@ package main
 import "fmt"
 
 func cli()  {
-	var command string
+
+	var command string	//Last command line command
+
 	for {
 		fmt.Println("Action:")
 		if _, err := fmt.Scanf("%s", &command); err != nil {
-			fmt.Printf("%s\n", err)
-			return
+			fmt.Printf("ERROR(cli): %s\n", err)
 		}
 		if "exit" == command {
-			fmt.Print("Terminating...")
+			fmt.Println("Terminating...")
 			return
 		}
 		fmt.Printf("Sorry, %q is not a command.  (exit) to terminate.\n", command)

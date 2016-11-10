@@ -19,11 +19,16 @@ func collector(delay int, url string, output chan Users){
 func getSmurfs(url string, smurfRoad chan Users) {
 	r, e := http.Get(url)
 	if e != nil{
-		fmt.Printf(e.Error())
+		fmt.Printf("ERROR(getsmurfs): " + e.Error())
+		return
 	}
 	defer r.Body.Close()
 
-	body, _ := ioutil.ReadAll(r.Body)
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		fmt.Printf("ERROR(getsmurfs): " + e.Error())
+		return
+	}
 	var users Users
 	json.Unmarshal(body, &users)
 

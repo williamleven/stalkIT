@@ -11,7 +11,7 @@ func coordinate(input chan Users, outputArrivals chan User, outputDepartures cha
 		oldUsers = users
 		users = <-input
 
-		go oldUsers.usersMissingFrom(users, outputArrivals) // arriving smurfs
-		go users.usersMissingFrom(oldUsers, outputDepartures) // leaving smurfs
+		oldUsers.usersMissingFrom(users, outputArrivals) // arriving smurfs
+		users.usersMissingFrom(oldUsers, outputDepartures) // leaving smurfs
 	}
 }
