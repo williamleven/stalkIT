@@ -4,7 +4,7 @@ import (
 	"github.com/0xAX/notificator"
 )
 
-func notifier(input chan User, append string)  {
+func notifier(input chan *User, append string)  {
 
 	var notify = notificator.New(notificator.Options{
 		DefaultIcon: "icon/default.png",

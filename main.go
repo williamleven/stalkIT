@@ -2,8 +2,8 @@ package main
 
 func main() {
 	input := make(chan *Users) // Delivering user Lists
-	outputArrivals := make(chan User) // Delivering users arriving
-	outputDepartures := make(chan User) // Delivering users leaving
+	outputArrivals := make(chan *User) // Delivering users arriving
+	outputDepartures := make(chan *User) // Delivering users leaving
 
 	// Handles frontend notifications
 	go notifier(outputArrivals, " has arrived at the Hubb")
