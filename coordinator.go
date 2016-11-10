@@ -1,9 +1,9 @@
 package main
 
-func coordinate(input chan Users, outputArrivals chan User, outputDepartures chan User)  {
+func coordinate(input chan *Users, outputArrivals chan User, outputDepartures chan User)  {
 
-	var users Users
-	var oldUsers Users
+	var users *Users
+	var oldUsers *Users
 
 	users = <-input
 

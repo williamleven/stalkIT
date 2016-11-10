@@ -1,7 +1,7 @@
 package main
 
 func main() {
-	input := make(chan Users) // Delivering user Lists
+	input := make(chan *Users) // Delivering user Lists
 	outputArrivals := make(chan User) // Delivering users arriving
 	outputDepartures := make(chan User) // Delivering users leaving
 
