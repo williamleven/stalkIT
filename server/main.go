@@ -1,19 +1,17 @@
 package main
 
-
 func main() {
-	input := make(chan *Users) 		// Delivering user Lists
-	outputArrivals := make(chan *User) 	// Delivering users arriving
-	outputDepartures := make(chan *User) 	// Delivering users leaving
-
-	// Handles frontend notifications
-	go notifier(outputArrivals, outputDepartures)
-
-	// Coordinates data-flow
-	go coordinate(input, outputArrivals, outputDepartures)
+	input := make(chan *Users) // Delivering user Lists
+	messages := make(chan *Message)
 
 	// Grabs and times data from hubbit
 	go collectorTimer(10, "https://hubbit.chalmers.it/sessions.json", input)
+
+	// Coordinates data-flow
+	go analyze(input, messages)
+
+	// Handles frontend notifications
+	go sender(messages)
 
 	// Halts at command line interface
 	cli()
