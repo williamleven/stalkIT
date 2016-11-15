@@ -7,39 +7,18 @@ import (
 // Sends notification in the format input + append
 func notifier(arrivals chan *User, departures chan *User)  {
 
-	// listen on all interfaces
-	ln, _ := net.Listen("tcp", ":7825")
-
-	// accept connection on port
-	//conn, _ := ln.Accept()
-
 	connections := make(map[net.Conn]bool)
 
-	go func(clients *map[net.Conn]bool) {
-		for {
-			conn, _ := ln.Accept()
-			(*clients)[conn] = true
-		}
-	}(&connections)
+	go connectionAcceptor(&connections)
 
 
-	c := make(chan string)
-	go func() {
-		for {
-			user := <-arrivals
-			c <- "A"+user.Nick
-		}
-	}()
-	go func() {
-		for {
-			user := <-departures
-			c <- "D"+user.Nick
-		}
-	}()
+	messages := make(chan string)
+	buildMessages(arrivals, departures, messages)
 
-	// Pushing notifications whenever receiving input
+
+	// Send message to all clients whenever receiving input
 	for {
-		message := <-c
+		message := <-messages
 		for conn, value := range connections {
 			if value {
 				conn.Write([]byte(message + "\n"))
@@ -48,3 +27,34 @@ func notifier(arrivals chan *User, departures chan *User)  {
 	}
 }
 
+func connectionAcceptor(clients *map[net.Conn]bool){
+	// Listen on all interfaces.
+	ln, _ := net.Listen("tcp", ":7825")
+	for {
+		conn, _ := ln.Accept()
+		(*clients)[conn] = true
+	}
+}
+
+func buildMessages(arrivals chan *User, departures chan *User, output chan string){
+	go func() {
+		for {
+			user := <-arrivals
+			message := StalkITMessage{
+				true,
+				user,
+			}
+			output <- string(message.toJson())
+		}
+	}()
+	go func() {
+		for {
+			user := <-departures
+			message := StalkITMessage{
+				false,
+				user,
+			}
+			output <- string(message.toJson())
+		}
+	}()
+}
