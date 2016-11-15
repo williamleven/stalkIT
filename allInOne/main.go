@@ -6,8 +6,8 @@ func main() {
 	outputDepartures := make(chan *User) 	// Delivering users leaving
 
 	// Handles frontend notifications
-	go notifier(outputArrivals, true)
-	go notifier(outputDepartures, false)
+	go notifier(outputArrivals, " has arrived at the Hubb")
+	go notifier(outputDepartures, " has left the Hubb")
 
 	// Coordinates data-flow
 	go coordinate(input, outputArrivals, outputDepartures)

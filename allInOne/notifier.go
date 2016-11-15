@@ -5,7 +5,7 @@ import (
 )
 
 // Sends notification in the format input + append
-func notifier(input chan *User, isInHubben bool)  {
+func notifier(input chan *User, append string)  {
 
 	// Creating notificator
 	var notify = notificator.New(notificator.Options{
