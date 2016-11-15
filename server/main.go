@@ -5,7 +5,7 @@ func main() {
 	messages := make(chan *Message)
 
 	// Grabs and times data from hubbit
-	go collectorTimer(10, "https://hubbit.chalmers.it/sessions.json", input)
+	go smurfGetter("https://hubbit.chalmers.it/sessions.json", input)
 
 	// Coordinates data-flow
 	go analyze(input, messages)

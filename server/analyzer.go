@@ -45,9 +45,9 @@ func fanInMessages(input1 chan *Message, input2 chan *Message, output chan *Mess
 	}()
 }
 
-func packer(input chan *User, action string, output *Message) {
+func packer(input chan *User, action string, output chan *Message) {
 	for {
-		output <- *Message{
+		output <-&Message{
 			action,
 			<-input,
 		}
