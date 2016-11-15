@@ -11,3 +11,16 @@ func (sm *Message) toJson() []byte {
 	message, _ := json.Marshal(sm)
 	return message
 }
+
+func fanInMessages(input1 chan *Message, input2 chan *Message, output chan *Message) {
+	go func() {
+		for {
+			output <- <-input1
+		}
+	}()
+	go func() {
+		for {
+			output <- <-input2
+		}
+	}()
+}
