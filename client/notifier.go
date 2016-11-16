@@ -9,7 +9,7 @@ import (
 )
 
 func notifier() {
-	conn, err := net.Dial("tcp", "localhost:7825")
+	conn, err := net.Dial("tcp", "stalkit.gurgy.me:4242")
 
 	if(err != nil) {
 		return;

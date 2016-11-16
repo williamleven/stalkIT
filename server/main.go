@@ -1,7 +1,7 @@
 package main
 
 // Broadcasting port
-var port string = ":7825"
+var port string = ":4242"
 
 func main() {
 
