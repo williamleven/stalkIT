@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"net"
 	"bufio"
+	"encoding/json"
 	"github.com/0xAX/notificator"
 )
 
 func notifier() {
-	conn, err := net.Dial("tcp", "localhost:7825")
+	conn, err := net.Dial("tcp", "stalkit.gurgy.me:4242")
 
 	if(err != nil) {
 		return;
@@ -23,19 +24,24 @@ func notifier() {
 	})
 
 	for {
-		data, err := bufio.NewReader(conn).ReadString('\n')
+		data, err := bufio.NewReader(conn).ReadString('\n') // TODO: Parse json-object whilst receiving data to better determine end-of-message
 
 		if err != nil {
 			return;
 		}
 
-		message := data[1:(len(data)-1)]
-		if data[0] == 'A' {
-			message += arrivalMessage
+		var message Message
+		// Parse json-object, ignore final '\n'-character
+		json.Unmarshal([]byte(data[:(len(data)-1)]), &message)
+
+		output := message.User.Nick
+		if message.Action == "Arrived" {
+			output += arrivalMessage
 		} else {
-			message += departureMessage
+			output += departureMessage
 		}
-		fmt.Println(message)
-		notify.Push("StalkIT", message, "icon/default.svg", notificator.UR_NORMAL)
+
+		fmt.Println(output)
+		notify.Push("StalkIT", output, "icon/default.svg", notificator.UR_NORMAL)
 	}
 }

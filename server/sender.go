@@ -19,6 +19,7 @@ func sender(messages chan *Message) {
 		for conn, value := range connections {
 			if value {
 				conn.Write(message.toJson())
+				conn.Write([]byte("\n"))
 			}
 		}
 	}
