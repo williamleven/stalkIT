@@ -6,13 +6,22 @@ import (
 	"bufio"
 	"encoding/json"
 	"github.com/0xAX/notificator"
+	"github.com/spacemonkeygo/openssl"
 )
 
 func notifier() {
-	conn, err := net.Dial("tcp", "stalkit.gurgy.me:4242")
+	ctx, err := NewCtx()
+	if err != nil {
+		panic(err)
+	}
+	err = ctx.LoadVerifyLocations("/etc/ssl/certs/ca-certificates.crt", "")
+	if err != nil {
+		panic(err)
+	}
+	conn, err := openssl.Dial("tcp", "stalkit.gurgy.me:4242", ctx, 0)
 
 	if(err != nil) {
-		return;
+		panic(err)
 	}
 
 	// Build notificator
