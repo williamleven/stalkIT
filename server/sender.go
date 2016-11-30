@@ -3,16 +3,29 @@ package main
 import (
 	"github.com/Gurgy/broadcastPool"
 	"net"
+	"github.com/spacemonkeygo/openssl"
 )
 
 // Sends notification in the format input + append
 func sender(messages chan *Message) {
 
+	// Creating certificate
+	ctx, err := openssl.NewCtxFromFiles("my_server.crt", "my_server.key")
+	if err != nil {
+		panic(err)
+	}
+
+	// Creating listener
+	l, err := openssl.Listen("tcp", ":7777", ctx)
+	if err != nil {
+		panic(err)
+	}
+
 	// Creates a new pool of connections
 	pool := broadcastPool.New(validateConnection)
 
 	// Accept connections to this pool
-	pool.Open(port)
+	pool.Open(l)
 
 	// Send message to all clients whenever receiving input
 	var message *Message
