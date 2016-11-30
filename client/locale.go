@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"encoding/json"
 	"github.com/pivotal-cf-experimental/jibber_jabber"
@@ -18,48 +19,42 @@ type Language struct {
 	Phrases []Phrase `json:"strings"`
 }
 
-var language Language
-
-func translate(label string) *string {
-	for _, phrase := range language.Phrases {
+func (l *Language)getPhrase(label string) string {
+	for _, phrase := range l.Phrases {
 		if phrase.Label == label {
-			return &phrase.Translated
+			return phrase.Translated
 		}
 	}
-	return &label
+	return label
 }
 
-func readTranslationFile(langCode string) (string) {
-	content, err := ioutil.ReadFile("translations/" + langCode + ".json")
-	if err != nil {
-		return ""; // TODO: Error
-	}
-
-	return string(content);
-}
-
-func setLocale(lc string) {
+func NewLanguage(lc string)(*Language, error) {
 	// Attempt to load translation
-	content := readTranslationFile(lc);
-
-	if content == "" && lc != "en" {
-		// Fallback to English
-		content = readTranslationFile("en")
+	content, err := ioutil.ReadFile("translations/" + lc + ".json")
+	if err != nil {
+		fmt.Printf("Failed to set %q as locale.\n", lc)
+		if lc != "en" {
+			return NewLanguage("en")
+		}
+		return nil, err
 	}
 
-	err := json.Unmarshal([]byte(content), &language)
+	var language Language
+	err = json.Unmarshal([]byte(content), &language)
 
 	if err != nil {
-		return; // TODO: Error
+		return nil, err
 	}
+
+	fmt.Printf("Setting locale %q.\n", lc)
+	return &language, nil
 }
 
-func detectLocale() {
+func DetectLocale()(string) {
 	lc, err := jibber_jabber.DetectLanguage()
 
 	if err == nil {
-		setLocale(lc)
-	} else {
-		setLocale("en")
+		return lc
 	}
+	return "en"
 }

@@ -33,9 +33,9 @@ func notifier() {
 
 		var output string
 		if message.Action == "Arrived" {
-			output = fmt.Sprintf(*translate("arrival_message"), message.User.Nick)
+			output = fmt.Sprintf(language.getPhrase("arrival_message"), message.User.Nick)
 		} else {
-			output = fmt.Sprintf(*translate("departure_message"), message.User.Nick)
+			output = fmt.Sprintf(language.getPhrase("departure_message"), message.User.Nick)
 		}
 
 		fmt.Println(output)
