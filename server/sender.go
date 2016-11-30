@@ -8,9 +8,11 @@ import (
 
 // Sends notification in the format input + append
 func sender(messages chan *Message) {
+	var CERTIFICATE string = "server.crt"
+	var KEY string = "server.key"
 
 	// Creating certificate
-	ctx, err := openssl.NewCtxFromFiles("my_server.crt", "my_server.key")
+	ctx, err := openssl.NewCtxFromFiles(CERTIFICATE, KEY)
 	if err != nil {
 		panic(err)
 	}
