@@ -11,14 +11,17 @@ import (
 
 // Collects user lists and send then back on the chanel
 func smurfGetter(url string, smurfRoad chan *Users) {
+
+	const SLEEPTIME time.Duration = time.Second * time.Duration(5)
+
 	for {
-		time.Sleep(time.Second * time.Duration(10))
+
+		time.Sleep(SLEEPTIME)
 		r, e := http.Get(url)
 		if e != nil {
 			fmt.Println("ERROR(getsmurfs): " + e.Error())
 			time.Sleep(time.Second) //Then retry
 		} else {
-			defer r.Body.Close()
 
 			body, err := ioutil.ReadAll(r.Body)
 			if err != nil {
@@ -30,6 +33,8 @@ func smurfGetter(url string, smurfRoad chan *Users) {
 
 				smurfRoad <- &users
 			}
+
+			r.Body.Close()
 		}
 	}
 }

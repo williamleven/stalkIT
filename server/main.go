@@ -10,9 +10,13 @@ func main() {
 	go smurfGetter("https://hubbit.chalmers.it/sessions.json", input)
 
 	// Analyzes data from input chanel and send arriving/ departures on respective chanel
+	newUsers := make(chan *User)   // Delivering new users
+	missingUsers := make(chan *User) // Delivering missing users
+	go analyze(input, newUsers, missingUsers)
+
 	arrivals := make(chan *User)   // Delivering users arriving
 	departures := make(chan *User) // Delivering users leaving
-	go analyze(input, arrivals, departures)
+	go departureHandler(missingUsers, departures, newUsers, arrivals)
 
 	// Packs users from the arrivals chanel and send them on messages1
 	messages1 := make(chan *Message)
