@@ -1,0 +1,14 @@
+{
+	"name":"English",
+	"code":"en",
+
+	"strings" : [
+		{ "label": "cli_prompt", "string": "Command:" },
+		{ "label": "cli_error", "string": "ERROR: %s" },
+		{ "label": "cli_invalid_command", "string": "Sorry, <%s> is not a command." },
+		{ "label": "cli_termination_guide", "string": "Type <%s> to terminate." },
+		{ "label": "quit_message", "string": "Terminating..." },
+		{ "label": "arrival_message", "string": "%q has arrived at the Hubb" },
+		{ "label": "departure_message", "string": "%q has left the Hubb" }
+	]
+}

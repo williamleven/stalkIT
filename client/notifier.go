@@ -15,9 +15,6 @@ func notifier() {
 		return;
 	}
 
-	arrivalMessage := " has arrived at the Hubb"
-	departureMessage := " has left the Hubb"
-
 	// Build notificator
 	var notify = notificator.New(notificator.Options{
 		AppName:     "StalkIT",
@@ -34,11 +31,11 @@ func notifier() {
 		// Parse json-object, ignore final '\n'-character
 		json.Unmarshal([]byte(data[:(len(data)-1)]), &message)
 
-		output := message.User.Nick
+		var output string
 		if message.Action == "Arrived" {
-			output += arrivalMessage
+			output = fmt.Sprintf(language.getPhrase("arrival_message"), message.User.Nick)
 		} else {
-			output += departureMessage
+			output = fmt.Sprintf(language.getPhrase("departure_message"), message.User.Nick)
 		}
 
 		fmt.Println(output)
