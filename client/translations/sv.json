@@ -1,0 +1,14 @@
+{
+	"name":"Svenska",
+	"code":"sv",
+
+	"strings" : [
+		{ "label": "cli_prompt", "string": "Kommando:" },
+		{ "label": "cli_error", "string": "FEL: %s" },
+		{ "label": "cli_invalid_command", "string": "<%s> är ej ett kommando." },
+		{ "label": "cli_termination_guide", "string": "Skriv <%s> för att avsluta." },
+		{ "label": "quit_message", "string": "Avslutar..." },
+		{ "label": "arrival_message", "string": "%q har anlänt till Hubben" },
+		{ "label": "departure_message", "string": "%q har lämnat Hubben" }
+	]
+}
