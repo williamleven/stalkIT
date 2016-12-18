@@ -2,24 +2,29 @@ package main
 
 import (
 	"fmt"
-	"net"
 	"bufio"
+	"io/ioutil"
 	"encoding/json"
 	"github.com/0xAX/notificator"
-	"github.com/spacemonkeygo/openssl"
+	"crypto/tls"
+	"crypto/x509"
 )
 
 func notifier() {
-	ctx, err := NewCtx()
-	if err != nil {
-		panic(err)
+	rootPEM, err := ioutil.ReadFile("public.cer")
+ 	if err != nil {
+		panic("Failed to read certificate file")
 	}
-	err = ctx.LoadVerifyLocations("/etc/ssl/certs/ca-certificates.crt", "")
-	if err != nil {
-		panic(err)
-	}
-	conn, err := openssl.Dial("tcp", "stalkit.gurgy.me:4242", ctx, 0)
 
+	roots := x509.NewCertPool()
+	ok := roots.AppendCertsFromPEM([]byte(rootPEM))
+	if !ok {
+		panic("Failed to parse root certificate")
+	}
+
+	conn, err := tls.Dial("tcp", "stalkit.gurgy.me:7825", &tls.Config{
+		RootCAs: roots,
+	})
 	if(err != nil) {
 		panic(err)
 	}
@@ -40,7 +45,11 @@ func notifier() {
 		// Parse json-object, ignore final '\n'-character
 		json.Unmarshal([]byte(data[:(len(data)-1)]), &message)
 
-		var output string
+		if message.User == nil {
+			continue
+		}
+
+		output := message.User.Nick
 		if message.Action == "Arrived" {
 			output = fmt.Sprintf(language.getPhrase("arrival_message"), message.User.Nick)
 		} else {

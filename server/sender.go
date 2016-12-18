@@ -3,22 +3,34 @@ package main
 import (
 	"github.com/Gurgy/broadcastPool"
 	"net"
-	"github.com/spacemonkeygo/openssl"
+	"crypto/tls"
+	"time"
+	"crypto/rand"
 )
 
 // Sends notification in the format input + append
 func sender(messages chan *Message) {
-	var CERTIFICATE string = "server.crt"
-	var KEY string = "server.key"
+	var CERTIFICATE string = "device.cer"
+	var KEY string = "device.key"
 
 	// Creating certificate
-	ctx, err := openssl.NewCtxFromFiles(CERTIFICATE, KEY)
+	cert, err := tls.LoadX509KeyPair(CERTIFICATE, KEY)
 	if err != nil {
 		panic(err)
 	}
 
+	config := tls.Config{
+		Certificates: []tls.Certificate{cert}}
+
+	now := time.Now()
+
+	config.Time = func() time.Time { return now }
+
+	config.Rand = rand.Reader
+
 	// Creating listener
-	l, err := openssl.Listen("tcp", ":7777", ctx)
+	l, err := tls.Listen("tcp", ":7825", &config)
+
 	if err != nil {
 		panic(err)
 	}

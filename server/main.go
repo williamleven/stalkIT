@@ -1,8 +1,5 @@
 package main
 
-// Broadcasting port
-var port string = ":4242"
-
 func main() {
 
 	// Grabs data from HubbIT and sends on input chanel
